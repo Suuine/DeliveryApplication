@@ -1,0 +1,98 @@
+﻿@using Kursova.Models.DTOs;
+@model AsortimentDisplayModel
+
+@{
+    ViewData["Title"] = "Asortiment";
+}
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/anortiment.css" asp-append-version="true" />
+<div class="header">
+    <div class="my-2">
+        <form asp-action="Asortiment" class="row row-cols-lg-auto g-3 align-items-center">
+            <div class="col-12">
+                <label class="visually-hidden" for="inlineFromInputGroupUsername">Category</label>
+                <div class="input-group">
+                    <select class="form-select" id="categoryId" name="categoryId">
+                        <option selected>Choose...</option>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category.Id">@category.NameCategory</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="col-12">
+                <input type="text" class="form-control" id="sTerm" name="sTerm" placeholder="Search dish" />
+            </div>
+            <div class="col-13">
+                <div class="ll">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    <a href="/Asortiment/Asortiment" class="btn btn-dark">Reset</a>
+                </div>
+            </div>
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="llll">
+                    <div class="small-button-container">
+                        <a class="w-100 btn btn-lg btn-primary small-button" asp-controller="UploadsAsortiment" asp-action="Create">Add new</a>
+                    </div>
+                </div>
+            }
+        </form>
+    </div>
+    <section class="packages" id="packages">
+        <div class="box-container">
+            @foreach (var asort in Model.Asortiments)
+            {
+                <div class="recipe">
+                    <div class="pizza-box">
+                        <img src="/pictures/@asort.Image" class="img-fluid" alt="@asort.Name">
+                    </div>
+                    <div class="recipe-content">
+                        <p class="recipe-tags"> @asort.CategoryName</p>
+                        <h1 class="recipe-title">@asort.Name</h1>
+                        <p class="recipe-desc">@asort.Description</p>
+                        <p class="recipe-title">@asort.Cost UAH</p>
+                        <button class="recipe-save" type="button" onclick="add(@asort.Id)">Add to cart</button>
+                    </div>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <div class="lll">
+                            <div class="small-button-container">
+                                <a class="w-100 btn btn-sm btn-primary small-button" href="/UploadsAsortiment/Edit?id=@asort.Id">Edit</a>
+                                <a class="w-100 btn btn-sm btn-primary small-button" href="/UploadsAsortiment/Details?id=@asort.Id">Details</a>
+                                <a class="w-100 btn btn-sm btn-primary small-button" href="/UploadsAsortiment/Delete?id=@asort.Id">Delete</a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+</div>
+@section Scripts {
+    <script>
+        async function add(asortimentId) {
+            var isAuthenticated = @(User.Identity.IsAuthenticated.ToString().ToLower());
+            console.log('Function add is called');
+            if (!isAuthenticated) {
+                window.location.href = "/Identity/Account/Login";
+                return;
+            }
+
+            try {
+                var antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                var response = await fetch(`/ShoppingCart/AddItem?asortimentId=${asortimentId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': antiForgeryToken
+                    },
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    </script>
+}

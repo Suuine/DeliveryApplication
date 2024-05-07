@@ -1,0 +1,126 @@
+﻿@model List<Goods>
+<link rel="stylesheet" href="~/css/statistic.css" asp-append-version="true" />
+<div style="width:100%" class="mt-2">
+    <h2>Statistic</h2>
+    <div class="date-range-container">
+        <label for="datetimeInput1" class="date-label">From</label>
+        <input type="datetime-local" id="datetimeInput1" name="selectedDateTime1" class="date-input">
+        <span id="Data-error"></span>
+
+        <label for="datetimeInput2" class="date-label">To</label>
+        <input type="datetime-local" id="datetimeInput2" name="selectedDateTime2" class="date-input">
+        <span id="Data-error"></span>
+
+        <button type="button" class="find-orders-button" onclick="findOrders()">Find</button>
+    </div>
+    @if (Model != null && Model.Any())
+    {
+        <div style="width:100%" class="mt-2">
+            <h4>All Orders</h4>
+            @foreach (var order in Model)
+            {
+                <div class="order-block">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>OrderDate</th>
+                                <th>OrderStatus</th>
+                                <th>Customer</th>
+                                <th>Deliverer</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>@order.CreatedDate?.ToString("dd-MM-yyyy")</td>
+                                <td>@order.GoodsStatus?.StatusName</td>
+                                <td>@order.NameUser</td>
+                                @if (order.DeliverOrders?.NameDeliverer == null)
+                                {
+                                    <td>Order hasn't been taken yet</td>
+                                }
+                                else
+                                {
+                                    <td>@order.DeliverOrders.NameDeliverer</td>
+                                }
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    @if (order.OrderDetails != null && order.OrderDetails.Any())
+                    {
+                        <table class="table sub-table">
+                            <thead>
+                                <tr>
+                                    <th>Asortiment</th>
+                                    <th>Image</th>
+                                    <th>Category</th>
+                                    <th>Unit Price</th>
+                                    <th>Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in order.OrderDetails)
+                                {
+                                    <tr>
+                                        <td>@item.Asortimet?.Name</td>
+                                        <td>
+                                            <img src="/pictures/@item.Asortimet?.Image" style="width:80px;height:100px" />
+                                        </td>
+                                        <td>@item.Asortimet?.Category?.NameCategory</td>
+                                        <td>@item.Asortimet?.Cost X @item.Quantity</td>
+                                        <td>@(item.Asortimet?.Cost * item.Quantity)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <h4>No any orders</h4>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        async function findOrders() {
+            var selectedDateTime1 = document.getElementById('datetimeInput1').value;
+            var selectedDateTime2 = document.getElementById('datetimeInput2').value;
+
+            if (!selectedDateTime1 || !selectedDateTime2) {
+                alert('Please select both From and To dates and times.');
+                return;
+            }
+
+            try {
+                // Convert date-time strings to UTC format
+                var date1 = new Date(selectedDateTime1);
+                var date2 = new Date(selectedDateTime2);
+
+                selectedDateTime1 = date1.toISOString();
+                selectedDateTime2 = date2.toISOString();
+
+                var response = await fetch(`/Admin/Find?selectedDateTime1=${selectedDateTime1}&selectedDateTime2=${selectedDateTime2}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                });
+
+                if (response.ok) {
+                    var data = await response.text();
+                    // Redirect to the Statistic page with the date range parameters
+                    window.location.href = `/Admin/Statistic?dateTime1=${selectedDateTime1}&dateTime2=${selectedDateTime2}`;
+                } else {
+                    console.error('Failed to fetch data:', response.status);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    </script>
+}

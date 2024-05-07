@@ -1,0 +1,53 @@
+﻿/* aboutus.css */
+
+body {
+    background-color: black;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h3, h4 {
+    color: #2c3e50;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+#about-us-content {
+    background-color: rgba(255, 255, 255, 0.3); 
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.about-section {
+    margin-bottom: 30px;
+}
+
+    .about-section ul {
+        margin-left: 20px;
+    }
+
+    .about-section h4 {
+        color: #A7C957; 
+    }
+
+    .about-section p {
+        color: #ecf0f1; 
+    }
+
+    .about-section li {
+        color: #27ae60; 
+    }

@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Deliver</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/header.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Deliver.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <div class='header'>
+        <div class='container'>
+            <div class='header-line'>
+                <div class='header-logo'>
+                    <img src="/pictures/logotup.png" alt="">
+                </div>
+                <div class='nav'>
+                    <a href="/">Home</a>
+                    <a asp-area="" asp-controller="About" asp-action="About">About us</a>
+                    <a asp-area="" asp-controller="Asortiment" asp-action="Asortiment">Asortiment</a>
+                    @if (User.IsInRole("User") || User.IsInRole("Deliverer") || User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="UserGoods" asp-action="UserGoods">My Orders</a>
+                        <div>
+                            <a class='cart-link' href="/ShoppingCart/GetUserCart">
+                                <img src='/pictures/cart.png' alt='Card'>
+                            </a>
+                        </div>
+                       
+                    }
+                    @if (User.IsInRole("Deliverer") || User.IsInRole("Admin"))
+                    {
+                        <select id="orderDropdown">
+                            <option selected>Deliver</option>
+                            <option value="/Delivers/OrdersDisplay">Take Order</option>
+                            <option value="/Delivers/TakenOrdersDisplay">My Taken Order</option>
+                        </select>
+                    }
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <select id="adminOption">
+                            <option selected>Admin</option>
+                            <option value="/Admin/AllOrders">Monitoring Orders</option>
+                            <option value="/Admin/AllUsers">Display All Users</option>
+                            <option value="/Admin/Statistic">Statistic</option>
+                        </select>
+                    }
+                    <partial name="_LoginPartial" />
+                    <div class='phone'>
+                        <div class='phone-holder'>
+                            <div class='phone-img'>
+                                <img src="/pictures/phone.png" alt="">
+                            </div>
+
+                            <div class='number'><a class='num' href='#'>+380-63-234-41-72</a></div>
+                        </div>
+
+                        <div class='phone-text'>
+                            REPORT A PROBLEM <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+        @RenderBody()
+        @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>
+<script>
+    document.getElementById('orderDropdown').addEventListener('change', function () {
+        var selectedOption = this.options[this.selectedIndex];
+        var url = selectedOption.value;
+        if (url) {
+            window.location.href = url;
+        }
+    });
+    document.getElementById('adminOption').addEventListener('change', function () {
+        var selectedOption = this.options[this.selectedIndex];
+        var url = selectedOption.value;
+        if (url) {
+            window.location.href = url;
+        }
+    });
+</script>

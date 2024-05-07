@@ -1,0 +1,101 @@
+﻿@model List<Goods>
+<link rel="stylesheet" href="~/css/takeorder.css" asp-append-version="true" />
+
+<div class="cart-container">
+    <h4 class="header-title">Pending Orders</h4>
+
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var order in Model)
+        {
+            <div class="order-block">
+                <table class="cart-table">
+                    <tr>
+                        <th>Order Date</th>
+                        <th>Order Status</th>
+                        <th>Name User</th>
+                    </tr>
+                    <tr>
+                        <td>@order.CreatedDate?.ToString("dd-MM-yyyy")</td>
+                        <td>@order.GoodsStatus?.StatusName</td>
+                        <td>@order.NameUser</td>
+                    </tr>
+                </table>
+
+                @if (order.OrderDetails != null && order.OrderDetails.Any() && order.GoodsStatus.Id == 1)
+                {
+                    <table class="sub-table">
+                        <tr>
+                            <td>Total:</td>
+                            <td>@order.OrderDetails.Sum(item => item.Asortimet?.Cost * item.Quantity)</td>
+                        </tr>
+                        <tr>
+                            <th>Asortiment</th>
+                            <th>Image</th>
+                            <th>Category</th>
+                            <th>Unit Price</th>
+                            <th>Total Price</th>
+                        </tr>
+                        @foreach (var item in order.OrderDetails)
+                        {
+                            <tr>
+                                <td>@item.Asortimet?.Name</td>
+                                <td>
+                                    <img src="/pictures/@item.Asortimet?.Image" class="product-image" />
+                                </td>
+                                <td>@item.Asortimet?.Category?.NameCategory</td>
+                                <td>@item.Asortimet?.Cost X @item.Quantity</td>
+                                <td>@(item.Asortimet?.Cost * item.Quantity)</td>
+                            </tr>
+                        }
+                        <tr>
+                            <td colspan="5">
+                                <div class="checkout-button">
+                                <button type="button" onclick="add(@order.Id)" class="btn btn-primary">Take</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <h2 class="empty-cart">No pending orders</h2>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        async function add(goodsId) {
+            var isAuthenticated = @(User.Identity.IsAuthenticated.ToString().ToLower());
+            console.log('Function add is called');
+            if (!isAuthenticated) {
+                window.location.href = "/Identity/Account/Login";
+                return;
+            }
+
+            try {
+                var antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                var response = await fetch(`/Delivers/Take?goodsId=${goodsId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': antiForgeryToken
+                    },
+                });
+
+                if (!response.ok) {
+                    console.error(`Error: ${response.status} - ${response.statusText}`);
+                } else {
+                    console.log('Order taken successfully');
+                    window.location.href = "/Delivers/OrdersDisplay";
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    </script>
+}

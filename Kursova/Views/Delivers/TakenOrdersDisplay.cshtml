@@ -1,0 +1,112 @@
+﻿@model List<Goods>
+<link rel="stylesheet" href="~/css/takenorders.css" asp-append-version="true" />
+
+<div style="width:100%" class="mt-2">
+    <h4>Taken Orders</h4>
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var order in Model)
+        {
+            <div class="order-block">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>OrderDate</th>
+                            <th>Orderer</th>
+                            <th>OrderStatus</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@order.CreatedDate?.ToString("dd-MM-yyyy")</td>
+                            <td>@order.NameUser</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                @if (order.OrderDetails != null && order.OrderDetails.Any())
+                {
+                    <table class="sub-table table table-bordered">
+                        <thead>
+                            <div class="rozm">
+                                <select class="form-select" id="statusDropdown_@order.Id">
+                                    <option selected>@order.GoodsStatus?.StatusName ...</option>
+                                    <option value="3">prepared</option>
+                                    <option value="4">finished</option>
+                                </select>
+                            </div>
+                            <tr>
+                                <th>Asortiment</th>
+                                <th>Image</th>
+                                <th>Category</th>
+                                <th>Unit Price</th>
+                                <th>Total Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in order.OrderDetails)
+                            {
+                                <tr>
+                                    <td>@item.Asortimet?.Name</td>
+                                    <td>
+                                        <img src="/pictures/@item.Asortimet?.Image" style="width:80px;height:100px" />
+                                    </td>
+                                    <td>@item.Asortimet?.Category?.NameCategory</td>
+                                    <td>@item.Asortimet?.Cost X @item.Quantity</td>
+                                    <td>@(item.Asortimet?.Cost * item.Quantity)</td>
+                                    <td colspan="5"></td>
+                                </tr>
+                            }                            
+                        </tbody>
+                        <div class="checkout-button">
+                        <button type="button" onclick="applyStatus(@order.Id)" class="btn btn-primary ">Apply</button>
+                        </div>
+                    </table>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <h2>No taken orders</h2>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        async function applyStatus(goodsId) {
+            var isAuthenticated = @(User.Identity.IsAuthenticated.ToString().ToLower());
+            console.log('Function applyStatus is called');
+
+            if (!isAuthenticated) {
+                window.location.href = "/Identity/Account/Login";
+                return;
+            }
+
+            try {
+                var antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                var statusDropdown = document.getElementById(`statusDropdown_${goodsId}`);
+                var selectedStatus = statusDropdown.value;
+
+                var response = await fetch(`/Delivers/ApplyStatus?goodsId=${goodsId}&status=${selectedStatus}`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-RequestVerificationToken': antiForgeryToken
+                    },
+                });
+
+                if (!response.ok) {
+                    console.error(`Error: ${response.status} - ${response.statusText}`);
+                } else {
+                    console.log('Status applied successfully');
+                    alert('Status is changed');
+                    window.location.href = "/Delivers/TakenOrdersDisplay";
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    </script>
+}

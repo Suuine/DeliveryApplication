@@ -1,0 +1,32 @@
+﻿@{
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout !=  null)
+    {
+        Layout = parentLayout.ToString();
+    }
+    else
+    {
+        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
+    }
+}
+<link rel="stylesheet" href="~/css/loginregistratecreateedit.css" asp-append-version="true" />
+
+<h1>Manage your account</h1>
+
+<div>
+    <h2>Change your account settings</h2>
+    <hr />
+    <div class="containerr">
+        <div class="logi">
+            <partial name="_ManageNav" />
+        </div>
+        <div class="form">
+        <div class="group">
+            @RenderBody()
+        </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

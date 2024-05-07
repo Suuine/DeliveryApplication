@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Deliver</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Deliver.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <span class="logo">Deliver</span>
+        <span class="main">
+            <a href="/">Home</a>
+            <a asp-area="" asp-controller="About" asp-action="About">About us</a>           
+            <a asp-area="" asp-controller="Asortiment" asp-action="Asortiment">Asortiment</a>           
+            <a asp-area="" asp-controller="Orders" asp-action="Index">Orders</a>
+            <a asp-area="" asp-controller="AppRoles" asp-action="Index">Roles</a>
+           
+        </span>
+        <span>
+        <partial name="_LoginPartial" />
+        </span>
+    </header>
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+    @RenderSection("Scripts", required: false)
+    @section Scripts {
+        <script src="your-script.js"></script>
+    }
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+﻿@model Kursova.Models.Asortimet
+
+@{
+    ViewData["Title"] = "Delete";
+}
+<link rel="stylesheet" href="~/css/cart.css" asp-append-version="true" />
+
+<body>
+<h4>Are you sure you want to delete this?</h4>
+    <div class="cart-container order-block mt-2">
+        <hr />
+    <table class="cart-table">
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Image)</th>
+            <td class="hoverable-row"><img src="~/pictures/@Model.Image" alt="Image" style="width:80px;height:100px" /></td>
+        </tr>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Name)</th>
+            <td class="hoverable-row">@Html.DisplayFor(model => model.Name)</td>
+        </tr>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Description)</th>
+            <td class="hoverable-row">@Html.DisplayFor(model => model.Description)</td>
+        </tr>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Cost)</th>
+            <td class="hoverable-row">@Html.DisplayFor(model => model.Cost)</td>
+        </tr>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Category)</th>
+            <td class="hoverable-row">@Html.DisplayFor(model => model.Category.NameCategory)</td>
+        </tr>
+    </table>
+
+    
+    <form asp-action="Delete">
+            <div class="delete">
+        <input type="hidden" asp-for="Id" />
+        <button id="login-submit" type="submit" class=" btn btn-lg">Delete</button>
+            </div>
+    </form>
+        
+    <div class="back">
+        <a asp-controller="Asortiment" asp-action="Asortiment">Back to List</a>
+    </div>
+</div>
+</body>
